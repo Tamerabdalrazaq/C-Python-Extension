@@ -1,6 +1,3 @@
-import mykmeanssp as kmeansmodule
-print(kmeansmodule.fit(0.5, 100))
-
 import numpy as np
 import pandas as pd
 import sys
@@ -9,7 +6,10 @@ import math
 EPSILON = 1.1
 ITER = 300
 np.random.seed(0)
-
+error_messages = {
+    "k": "Invalid number of clusters!",
+    "iter": "Invalid maximum iteration!",
+}
 
 # joins two given vectors of length n/2 into one vector of length n
 def combine_data(data1, data2):
@@ -64,11 +64,31 @@ def main():
     k = iter = data1 = data2 = None
     args = sys.argv
     k = args[1]
-    iter = args[2]
-    data1 = args[3]
-    data2 = args[4]
-    data = combine_data(data1, data2)
+    
+    if  len(sys.argv) >= 5:
+        iter = args[2]
+        data1 = args[3]
+        data2 = args[4]
+        if (not iter.isdigit()): return (print(error_messages["iter"]))
+        else: iter = int(iter)
+        data = combine_data(data1, data2)
+    else:
+        iter = ITER
+        data1 = args[2]
+        data2 = args[3]
+        data = combine_data(data1, data2)
+    k= int(k)
+    #checks if the arguments are natural numbers
+    if (not k.isdigit()): return (print(error_messages["k"]))
+
+    #checks the validity of the arguments
+    if (K<=1 or N<=K): return print(error_messages["K"])
+    if (not 1<iter<1000): return print(error_messages["iter"])
+
     np_arr = data.values
     n = np_arr.shape[0]
     d = np_arr.shape[1]
     kmeansplus(k, n, d, iter, data)
+
+
+    
