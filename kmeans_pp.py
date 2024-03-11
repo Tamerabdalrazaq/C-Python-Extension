@@ -32,19 +32,17 @@ def main():
         data1 = args[3]
         data2 = args[4]
         data = combine_data(data1, data2)
-    k= int(k)
+    
     eps= float(eps)
     #checks if the arguments are natural numbers
     if (not k.isdigit()): return (print(error_messages["k"]))
-
+    k= int(k)
     #checks the validity of the arguments
-    if (K<=1 or N<=K): return print(error_messages["K"])
     if (not 1<iter<1000): return print(error_messages["iter"])
-
-    
     n = data.shape[0]
     d = data.shape[1]
-    kmeansplus(k, n, d, iter, data)
+    if (k<=1 or n<=k): return print(error_messages["k"])
+    print(kmeansplus(k, n, d, iter, data))
 
 
 
@@ -85,7 +83,7 @@ def kmeansplus(k, n, d, iter, data):
         new_clust_ind = np.random.choice(n, p=prob)
         indices.append(new_clust_ind)
         clusters[cur+1]=data[new_clust_ind]
-        cur++
+        cur+=1
     return clusters
 
 
@@ -105,4 +103,10 @@ def find_DX(clusters, v):
     return DX
 
 
+#for checks
+try:
+    main()
+except Exception as e:
+    print("An Error Has Occured")
+    print(e)
     
