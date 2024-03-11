@@ -3,43 +3,89 @@ import pandas as pd
 import sys
 import math
 
-EPSILON = 1.1
 ITER = 300
-np.random.seed(0)
 error_messages = {
     "k": "Invalid number of clusters!",
     "iter": "Invalid maximum iteration!",
 }
 
+
+# needs to be fixed (like the kmeans in project1)
+# errors might need to be handled by c errors system
+# k, iter, eps, data1, data2
+def main():
+    k = iter = eps = data1 = data2 = None
+    args = sys.argv
+    k = args[1]
+    
+    if  len(sys.argv) >= 6:
+        iter = args[2]
+        eps = args[3]
+        data1 = args[4]
+        data2 = args[5]
+        if (not iter.isdigit()): return (print(error_messages["iter"]))
+        else: iter = int(iter)
+        data = combine_data(data1, data2)
+    else:
+        iter = ITER
+        eps = args[2]
+        data1 = args[3]
+        data2 = args[4]
+        data = combine_data(data1, data2)
+    k= int(k)
+    eps= float(eps)
+    #checks if the arguments are natural numbers
+    if (not k.isdigit()): return (print(error_messages["k"]))
+
+    #checks the validity of the arguments
+    if (K<=1 or N<=K): return print(error_messages["K"])
+    if (not 1<iter<1000): return print(error_messages["iter"])
+
+    
+    n = data.shape[0]
+    d = data.shape[1]
+    kmeansplus(k, n, d, iter, data)
+
+
+
+
+
 # joins two given vectors of length n/2 into one vector of length n
 def combine_data(data1, data2):
-    df1 = pd.read_csv('data1', header=None)
-    df2 = pd.read_csv('data2', header=None)
-    df1.iloc[:, 0].name = 'indx'
-    df2.iloc[:, 0].name = 'indx'
-    df1.set_index('indx', inplace=True)
-    df2.set_index('indx', inplace=True)
-    result_str = pd.merge(df1, df2, on='indx', how='inner')
-    result = result_str.astype(float)
-    result_sorted = result.sort_index()
-    return result_sorted
+    df1 = pd.read_csv(data1, header=None)
+    df2 = pd.read_csv(data2, header=None)
+    df1.columns=["key"]+df1.columns.tolist()[1:]
+    df2.columns=["key"]+df2.columns.tolist()[1:]
+    result_str=pd.merge(df1,df2,on="key")
+    res = result_str.astype(float)
+    res_sorted = res.sort_values(by="key")
+    np_arr = res_sorted[res_sorted.columns[1:]].values
+    return np_arr
 
 
 # data is a 2D matrix of the dimensions nxd
 def kmeansplus(k, n, d, iter, data):
+    datacopy=data.copy()
+    np.random.seed(0)
     ind = np.random.choice(n)
     rnd_clus = data[ind]
-    clusters = [rnd_clus]
-    for i in range(k):  # untill we get k clusters
+    clusters = np.zeros((k,d))
+    clusters[0]=data[ind]
+    indices = [ind] #represents the indices of the final chosen k clusters
+    clus_len=1
+    cur=0 #indicates the index of the last cluster added 
+    for i in range(k-1):  # untill we get k clusters
         sum = 0
         DX_arr = []
         for row in data:
-            DX = find_DX(clusters, row)
+            DX = find_DX(clusters[:clus_len, :], row)
             sum+= DX
             DX_arr.append(DX)
         prob = [dx/sum for dx in DX_arr]
         new_clust_ind = np.random.choice(n, p=prob)
-        clusters.append(data[new_clust_ind])
+        indices.append(new_clust_ind)
+        clusters[cur+1]=data[new_clust_ind]
+        cur++
     return clusters
 
 
@@ -57,38 +103,6 @@ def find_DX(clusters, v):
         if distance < DX:
             DX = distance
     return DX
-
-
-# needs to be fixed (like the kmeans in project1)
-def main():
-    k = iter = data1 = data2 = None
-    args = sys.argv
-    k = args[1]
-    
-    if  len(sys.argv) >= 5:
-        iter = args[2]
-        data1 = args[3]
-        data2 = args[4]
-        if (not iter.isdigit()): return (print(error_messages["iter"]))
-        else: iter = int(iter)
-        data = combine_data(data1, data2)
-    else:
-        iter = ITER
-        data1 = args[2]
-        data2 = args[3]
-        data = combine_data(data1, data2)
-    k= int(k)
-    #checks if the arguments are natural numbers
-    if (not k.isdigit()): return (print(error_messages["k"]))
-
-    #checks the validity of the arguments
-    if (K<=1 or N<=K): return print(error_messages["K"])
-    if (not 1<iter<1000): return print(error_messages["iter"])
-
-    np_arr = data.values
-    n = np_arr.shape[0]
-    d = np_arr.shape[1]
-    kmeansplus(k, n, d, iter, data)
 
 
     
