@@ -1,4 +1,4 @@
-import numpy as np
+import kmeansmodule as g
 import pandas as pd
 import sys
 import math
@@ -14,35 +14,37 @@ error_messages = {
 # errors might need to be handled by c errors system
 # k, iter, eps, data1, data2
 def main():
-    k = iter = eps = data1 = data2 = None
-    args = sys.argv
-    k = args[1]
+    print(g.fit(5,4))
+# def main():
+#     k = iter = eps = data1 = data2 = None
+#     args = sys.argv
+#     k = args[1]
     
-    if  len(sys.argv) >= 6:
-        iter = args[2]
-        eps = args[3]
-        data1 = args[4]
-        data2 = args[5]
-        if (not iter.isdigit()): return (print(error_messages["iter"]))
-        else: iter = int(iter)
-        data = combine_data(data1, data2)
-    else:
-        iter = ITER
-        eps = args[2]
-        data1 = args[3]
-        data2 = args[4]
-        data = combine_data(data1, data2)
+#     if  len(sys.argv) >= 6:
+#         iter = args[2]
+#         eps = args[3]
+#         data1 = args[4]
+#         data2 = args[5]
+#         if (not iter.isdigit()): return (print(error_messages["iter"]))
+#         else: iter = int(iter)
+#         data = combine_data(data1, data2)
+#     else:
+#         iter = ITER
+#         eps = args[2]
+#         data1 = args[3]
+#         data2 = args[4]
+#         data = combine_data(data1, data2)
     
-    eps= float(eps)
-    #checks if the arguments are natural numbers
-    if (not k.isdigit()): return (print(error_messages["k"]))
-    k= int(k)
-    #checks the validity of the arguments
-    if (not 1<iter<1000): return print(error_messages["iter"])
-    n = data.shape[0]
-    d = data.shape[1]
-    if (k<=1 or n<=k): return print(error_messages["k"])
-    print(kmeansplus(k, n, d, iter, data))
+#     eps= float(eps)
+#     #checks if the arguments are natural numbers
+#     if (not k.isdigit()): return (print(error_messages["k"]))
+#     k= int(k)
+#     #checks the validity of the arguments
+#     if (not 1<iter<1000): return print(error_messages["iter"])
+#     n = data.shape[0]
+#     d = data.shape[1]
+#     if (k<=1 or n<=k): return print(error_messages["k"])
+#     print(kmeansplus(k, n, d, iter, data))
 
 
 
