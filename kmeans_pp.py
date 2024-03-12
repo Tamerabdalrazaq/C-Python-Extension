@@ -14,7 +14,7 @@ error_messages = {
 # errors might need to be handled by c errors system
 # k, iter, eps, data1, data2
 def main():
-    print(g.fit(5,4))
+    print(g.fit(2, 3, 3, 1000, 0.001, [10,20]))
 # def main():
 #     k = iter = eps = data1 = data2 = None
 #     args = sys.argv

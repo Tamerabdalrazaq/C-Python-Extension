@@ -1,34 +1,103 @@
 #include <Python.h>
 #define PY_SSIZE_T_CLEAN
-
+#include "kmeans.h"
 #include <stdio.h>
 #include <math.h>
 
-double k_means(double z, int n)
+void printArray(int *arr, int length)
 {
-    double geo_sum = 0;
+    printf("[");
+    for (int i = 0; i < length; ++i)
+    {
+        printf("%d", arr[i]);
+        if (i < length - 1)
+        {
+            printf(", ");
+        }
+    }
+    printf("]\n");
+}
+
+double k_means_wrapper(int K, int N, int d, int iter, double epsilon)
+{
+    printf("K: %d, N:%d, d: %d, iter: %d, epsilon: %f\n", K, N, d, iter, epsilon);
+    return myFunction();
+}
+
+void print_matrix(int **matrix, int rows, int cols)
+{
+    printf("Received matrix:\n");
+    for (int i = 0; i < rows; i++)
+    {
+        for (int j = 0; j < cols; j++)
+        {
+            printf("%d ", matrix[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+void *process_matrix_interface(PyObject *list)
+{
+    // PyObject *item;
+    // int n = PyObject_Length(list);
+    // if (n < 0)
+    // {
+    // return NULL;
+    // }
+    // item = PyList_GetItem(list, 0);
+    // convert_list_to_array(list);
+    // printArray(arr, 3);
+}
+
+void *convert_list_to_array(PyObject *list)
+{
+    PyObject *item;
+    int n = PyObject_Length(list);
+    if (n < 0)
+    {
+        return NULL;
+    }
+    // printf("%d\n", PyObject_Length(list));
+    int *arr = (int *)malloc(n * sizeof(int));
+    if (arr == NULL)
+    {
+        printf("Memory allocation failed. Exiting.\n");
+        return NULL;
+    }
     int i;
     for (i = 0; i < n; i++)
     {
-        /* pow(x,y) function raises x to the power of y - it is from <math.h> */
-        geo_sum += z;
+        item = PyList_GetItem(list, i);
+        arr[i] = PyLong_AsLong(item);
     }
-    return 10;
+    return arr;
+}
+
+void parse_input(PyObject *args, int *K, int *N, int *d, int *iter, double *epsilon, int **indexes)
+{
+    // PyObject *lst;
+    PyObject *indexes_list_ptr;
+    /* This parses the Python arguments into a double (d)  variable named z and int (i) variable named n*/
+    if (!PyArg_ParseTuple(args, "iiiidO", K, N, d, iter, epsilon, &indexes_list_ptr))
+    {
+        return NULL;
+    }
+    // *data = process_matrix_interface(data_list_ptr);
+    *indexes = convert_list_to_array(indexes_list_ptr);
 }
 
 static PyObject *fit(PyObject *self, PyObject *args)
 {
-    double z;
-    int n;
-    /* This parses the Python arguments into a double (d)  variable named z and int (i) variable named n*/
-    if (!PyArg_ParseTuple(args, "di", &z, &n))
-    {
-        return NULL; /* In the CPython API, a NULL value is never valid for a
-                        PyObject* so it is used to signal that an error has occurred. */
-    }
+    int K, N, d, iter;
+    double epsilon;
+    int *initial_centroid_indexes;
+
+    parse_input(args, &K, &N, &d, &iter, &epsilon, &initial_centroid_indexes);
+    printArray(initial_centroid_indexes, K);
 
     /* This builds the answer ("d" = Convert a C double to a Python floating point number) back into a python object */
-    return Py_BuildValue("d", k_means(z, n)); /*  Py_BuildValue(...) returns a PyObject*  */
+    return Py_BuildValue("d", k_means_wrapper(K, N, d, iter, epsilon)); /*  Py_BuildValue(...) returns a PyObject*  */
 }
 
 static PyMethodDef geoMethods[] = {
