@@ -86,6 +86,7 @@ def kmeansplus(k, n, d, iter, data):
         indices.append(new_clust_ind)
         clusters[cur+1]=data[new_clust_ind]
         cur+=1
+        clus_len+=1
     return clusters
 
 
