@@ -87,7 +87,7 @@ def kmeansplus(k, n, d, iter, data):
         clusters[cur+1]=data[new_clust_ind]
         cur+=1
         clus_len+=1
-    return clusters
+    return indices
 
 
 def euc_l2(v1, v2):
