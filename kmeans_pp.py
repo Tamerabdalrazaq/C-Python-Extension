@@ -45,12 +45,16 @@ def main():
     if (k<=1 or n<=k): return print(error_messages["k"])
     indices = (kmeansplus(k, n, d, iter, data))
     print(data.flatten().tolist())
-    print(indices)
     outputlist=(g.fit(k, n, d, iter, eps, indices, data.flatten().tolist()))
     print("***************************************")
     print("Pyhton")
     print(outputlist)
     print(arr_to_mtrx(outputlist,d,k))
+    print("***********real output************")
+    print(indices)
+    for row in outputlist:
+        print(",".join(map(str, row)))
+    print("")
 
 
 
