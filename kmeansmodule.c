@@ -18,22 +18,27 @@ void printArray(int *arr, int length)
     printf("]\n");
 }
 
-void print2DArray(int **arr, int rows, int cols)
+void print2DArray(double **arr, int rows, int cols)
 {
     for (int i = 0; i < rows; i++)
     {
         for (int j = 0; j < cols; j++)
         {
-            printf("%d\t", arr[i][j]);
+            printf("%f\t", arr[i][j]);
         }
         printf("\n");
     }
 }
 
-double k_means_wrapper(int K, int N, int d, int iter, double epsilon)
+double *k_means_wrapper(int K, int N, int d, int iter, double epsilon, int *indices, double **data)
 {
     printf("K: %d, N:%d, d: %d, iter: %d, epsilon: %f\n", K, N, d, iter, epsilon);
-    return myFunction();
+    double **centroids = k_means(K, N, d, epsilon, iter, indices, data);
+    double *spread_centroids = spread_matrix(centroids, K, d);
+    printf("Returned from C k_means: \n");
+    print2DArray(centroids, K, d);
+    free_matrix(centroids, K);
+    return spread_centroids;
 }
 
 void print_matrix(int **matrix, int rows, int cols)
@@ -49,11 +54,55 @@ void print_matrix(int **matrix, int rows, int cols)
     }
 }
 
-void *convert_array_to_matrix(int *arr, int N, int d)
+PyObject *convert_array_to_python_list(double *arr, int N)
 {
-    printf("hi\n");
+    PyObject *py_list = PyList_New(N);
+    if (py_list == NULL)
+    {
+        printf("Error creating Python list. Exiting.\n");
+        return NULL;
+    }
+
+    for (int i = 0; i < N; i++)
+    {
+        PyObject *py_double = Py_BuildValue("d", arr[i]);
+        if (py_double == NULL)
+        {
+            printf("Error creating Python double object. Exiting.\n");
+            Py_DECREF(py_list);
+            return NULL;
+        }
+        PyList_SetItem(py_list, i, py_double);
+    }
+
+    return py_list;
+}
+
+double *spread_matrix(double **matrix, int N, int d)
+{
+    double *arr = (double *)malloc(N * d * sizeof(double));
+    if (arr == NULL)
+    {
+        printf("Memory allocation failed. Exiting.\n");
+        return NULL;
+    }
+
+    int index = 0;
+    for (int i = 0; i < N; i++)
+    {
+        for (int j = 0; j < d; j++)
+        {
+            arr[index++] = matrix[i][j];
+        }
+    }
+
+    return arr;
+}
+
+double **convert_array_to_matrix(double *arr, int N, int d)
+{
     int i;
-    int **matrix = (int **)malloc(N * sizeof(int *));
+    double **matrix = (double **)malloc(N * sizeof(double *));
     if (matrix == NULL)
     {
         printf("Memory allocation failed. Exiting.\n");
@@ -61,18 +110,18 @@ void *convert_array_to_matrix(int *arr, int N, int d)
     }
     for (i = 0; i < N; i++)
     {
-        matrix[i] = (int *)malloc(d * sizeof(int));
+        matrix[i] = (double *)malloc(d * sizeof(double));
     }
     for (i = 0; i < N * d; i++)
     {
-        int item = arr[i];
+        double item = arr[i];
         matrix[i / d][i % d] = item;
     }
     free(arr);
     return matrix;
 }
 
-void *convert_list_to_array(PyObject *list)
+void *convert_list_to_int_array(PyObject *list)
 {
     PyObject *item;
     int n = PyObject_Length(list);
@@ -96,7 +145,31 @@ void *convert_list_to_array(PyObject *list)
     return arr;
 }
 
-void parse_input(PyObject *args, int *K, int *N, int *d, int *iter, double *epsilon, int **indexes, int **data_array)
+void *convert_list_to_double_array(PyObject *list)
+{
+    PyObject *item;
+    int n = PyObject_Length(list);
+    if (n < 0)
+    {
+        return NULL;
+    }
+    // printf("%d\n", PyObject_Length(list));
+    double *arr = (double *)malloc(n * sizeof(double));
+    if (arr == NULL)
+    {
+        printf("Memory allocation failed. Exiting.\n");
+        return NULL;
+    }
+    int i;
+    for (i = 0; i < n; i++)
+    {
+        item = PyList_GetItem(list, i);
+        arr[i] = PyFloat_AsDouble(item);
+    }
+    return arr;
+}
+
+void parse_input(PyObject *args, int *K, int *N, int *d, int *iter, double *epsilon, int **indexes, double **data_array)
 {
     // PyObject *lst;
     PyObject *indexes_list_ptr;
@@ -107,8 +180,8 @@ void parse_input(PyObject *args, int *K, int *N, int *d, int *iter, double *epsi
         return NULL;
     }
     // *data = process_matrix_interface(data_list_ptr);
-    *indexes = convert_list_to_array(indexes_list_ptr);
-    *data_array = convert_list_to_array(data_list_ptr);
+    *indexes = convert_list_to_int_array(indexes_list_ptr);
+    *data_array = convert_list_to_double_array(data_list_ptr);
 }
 
 static PyObject *fit(PyObject *self, PyObject *args)
@@ -116,19 +189,17 @@ static PyObject *fit(PyObject *self, PyObject *args)
     int K, N, d, iter;
     double epsilon;
     int *initial_centroid_indexes;
-    int *data_array;
-    int **data_matrix;
+    double *data_array;
+    double **data_matrix;
 
     parse_input(args, &K, &N, &d, &iter, &epsilon, &initial_centroid_indexes, &data_array);
     printArray(initial_centroid_indexes, K);
-    printArray(data_array, N * d);
     data_matrix = convert_array_to_matrix(data_array, N, d);
     printf("\n");
     print2DArray(data_matrix, N, d);
     printf("\n");
-
-    /* This builds the answer ("d" = Convert a C double to a Python floating point number) back into a python object */
-    return Py_BuildValue("d", k_means_wrapper(K, N, d, iter, epsilon)); /*  Py_BuildValue(...) returns a PyObject*  */
+    double *spread_centroids = k_means_wrapper(K, N, d, iter, epsilon, initial_centroid_indexes, data_matrix);
+    return convert_array_to_python_list(spread_centroids, K * d);
 }
 
 static PyMethodDef geoMethods[] = {

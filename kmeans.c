@@ -4,7 +4,6 @@
 #include <math.h>
 #include <ctype.h>
 
-#define EPSILON 0.001
 #define ITER 200
 #define ERROR_K "Invalid number of clusters!"
 #define ERROR_N "Invalid number of points!"
@@ -140,7 +139,7 @@ double *calc_centroid_average(Cluster cluster, int d)
 }
 
 /*checks if the last change of centroids is less than epsilon for each*/
-int check_centroid_convergence(double **centroids, double **new_centroids, int k, int d)
+int check_centroid_convergence(double **centroids, double **new_centroids, int k, int d, double epsilon)
 {
     int i, convergent_centroids;
     double *centroid_old, *centroid_new;
@@ -149,7 +148,7 @@ int check_centroid_convergence(double **centroids, double **new_centroids, int k
     {
         centroid_old = centroids[i];
         centroid_new = new_centroids[i];
-        if (euc_l2(centroid_old, centroid_new, d) <= EPSILON)
+        if (euc_l2(centroid_old, centroid_new, d) <= epsilon)
             convergent_centroids += 1;
     }
     return (convergent_centroids == k);
@@ -168,13 +167,13 @@ void add_vector_to_centroid(Cluster *clus, double const vec[], int d)
     clus->size = clus->size + 1;
 }
 
-double **k_means(int k, int n, int d, int iter, double **data, int *centroids_initial_indexes)
+double **k_means(int k, int n, int d, double epsilon, int iter, int *centroids_initial_indexes, double **data)
 {
     /*creates the initial centroids according to the first k vectors given in the input*/
     int i, j, data_i, convergence, closest_centroid_index;
     double **centroids, **updated_centroids;
     double *x;
-
+    printf("k_means_func\n");
     centroids = sub_matrix_k(data, k, d, centroids_initial_indexes);
     for (i = 0; i < iter; i++)
     {
@@ -195,7 +194,7 @@ double **k_means(int k, int n, int d, int iter, double **data, int *centroids_in
         {
             updated_centroids[j] = calc_centroid_average(new_centroids[j], d);
         }
-        convergence = check_centroid_convergence(updated_centroids, centroids, k, d);
+        convergence = check_centroid_convergence(updated_centroids, centroids, k, d, epsilon);
         free_matrix(centroids, k);
         free_clusters(new_centroids, k);
         centroids = updated_centroids;

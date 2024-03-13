@@ -2,6 +2,7 @@ import kmeansmodule as g
 import pandas as pd
 import sys
 import math
+import numpy as np
 
 ITER = 300
 error_messages = {
@@ -14,37 +15,38 @@ error_messages = {
 # errors might need to be handled by c errors system
 # k, iter, eps, data1, data2
 def main():
-    print(g.fit(2, 3, 3, 1000, 0.001, [0,1], [1,2,3,4,5,6,7,8,9]))
-# def main():
-#     k = iter = eps = data1 = data2 = None
-#     args = sys.argv
-#     k = args[1]
+    k = iter = eps = data1 = data2 = None
+    args = sys.argv
+    k = args[1]
     
-#     if  len(sys.argv) >= 6:
-#         iter = args[2]
-#         eps = args[3]
-#         data1 = args[4]
-#         data2 = args[5]
-#         if (not iter.isdigit()): return (print(error_messages["iter"]))
-#         else: iter = int(iter)
-#         data = combine_data(data1, data2)
-#     else:
-#         iter = ITER
-#         eps = args[2]
-#         data1 = args[3]
-#         data2 = args[4]
-#         data = combine_data(data1, data2)
+    if  len(sys.argv) >= 6:
+        iter = args[2]
+        eps = args[3]
+        data1 = args[4]
+        data2 = args[5]
+        if (not iter.isdigit()): return (print(error_messages["iter"]))
+        else: iter = int(iter)
+        data = combine_data(data1, data2)
+    else:
+        iter = ITER
+        eps = args[2]
+        data1 = args[3]
+        data2 = args[4]
+        data = combine_data(data1, data2)
     
-#     eps= float(eps)
-#     #checks if the arguments are natural numbers
-#     if (not k.isdigit()): return (print(error_messages["k"]))
-#     k= int(k)
-#     #checks the validity of the arguments
-#     if (not 1<iter<1000): return print(error_messages["iter"])
-#     n = data.shape[0]
-#     d = data.shape[1]
-#     if (k<=1 or n<=k): return print(error_messages["k"])
-#     print(kmeansplus(k, n, d, iter, data))
+    eps= float(eps)
+    #checks if the arguments are natural numbers
+    if (not k.isdigit()): return (print(error_messages["k"]))
+    k= int(k)
+    #checks the validity of the arguments
+    if (not 1<iter<1000): return print(error_messages["iter"])
+    n = data.shape[0]
+    d = data.shape[1]
+    if (k<=1 or n<=k): return print(error_messages["k"])
+    indices = (kmeansplus(k, n, d, iter, data))
+    print(data.flatten().tolist())
+    print(indices)
+    print(g.fit(k, n, d, iter, eps, indices, data.flatten().tolist()))
 
 
 
