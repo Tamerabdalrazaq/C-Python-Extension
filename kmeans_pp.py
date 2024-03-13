@@ -47,8 +47,6 @@ def main():
     outputlist=(g.fit(k, n, d, iter, eps, indices, data.flatten().tolist()))
     output = arr_to_mtrx(outputlist,d,k)
     out = [[round(num, 4) for num in centroid] for centroid in output]
-    print(out)
-    print("***********real output************")
     list_str = ', '.join(map(str, indices))
     print(list_str)
     for row in out:
@@ -116,7 +114,6 @@ def find_DX(clusters, v):
 
 def arr_to_mtrx(outputlist,d,k):
     mtrx=[[0]*d for i in range(k)]
-    print(mtrx)
     for i in range(len(outputlist)):
         mtrx[i//d][i%d] = outputlist[i]
     return mtrx

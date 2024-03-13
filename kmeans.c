@@ -173,7 +173,6 @@ double **k_means(int k, int n, int d, double epsilon, int iter, int *centroids_i
     int i, j, data_i, convergence, closest_centroid_index;
     double **centroids, **updated_centroids;
     double *x;
-    printf("k_means_func\n");
     centroids = sub_matrix_k(data, k, d, centroids_initial_indexes);
     for (i = 0; i < iter; i++)
     {

@@ -53,11 +53,8 @@ void print2DArray(double **arr, int rows, int cols)
 
 double *k_means_wrapper(int K, int N, int d, int iter, double epsilon, int *indices, double **data)
 {
-    printf("K: %d, N:%d, d: %d, iter: %d, epsilon: %f\n", K, N, d, iter, epsilon);
     double **centroids = k_means(K, N, d, epsilon, iter, indices, data);
     double *spread_centroids = spread_matrix(centroids, K, d);
-    printf("Returned from C k_means: \n");
-    print2DArray(centroids, K, d);
     free_matrix(centroids, K);
     return spread_centroids;
 }
@@ -193,11 +190,7 @@ static PyObject *fit(PyObject *self, PyObject *args)
     double **data_matrix;
 
     parse_input(args, &K, &N, &d, &iter, &epsilon, &initial_centroid_indexes, &data_array);
-    printArray(initial_centroid_indexes, K);
     data_matrix = convert_array_to_matrix(data_array, N, d);
-    printf("\n");
-    print2DArray(data_matrix, N, d);
-    printf("\n");
     double *spread_centroids = k_means_wrapper(K, N, d, iter, epsilon, initial_centroid_indexes, data_matrix);
     return convert_array_to_python_list(spread_centroids, K * d);
 }
