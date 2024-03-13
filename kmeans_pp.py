@@ -44,15 +44,14 @@ def main():
     d = data.shape[1]
     if (k<=1 or n<=k): return print(error_messages["k"])
     indices = (kmeansplus(k, n, d, iter, data))
-    print(data.flatten().tolist())
     outputlist=(g.fit(k, n, d, iter, eps, indices, data.flatten().tolist()))
-    print("***************************************")
-    print("Pyhton")
-    print(outputlist)
-    print(arr_to_mtrx(outputlist,d,k))
+    output = arr_to_mtrx(outputlist,d,k)
+    out = [[round(num, 4) for num in centroid] for centroid in output]
+    print(out)
     print("***********real output************")
-    print(indices)
-    for row in outputlist:
+    list_str = ', '.join(map(str, indices))
+    print(list_str)
+    for row in out:
         print(",".join(map(str, row)))
     print("")
 
