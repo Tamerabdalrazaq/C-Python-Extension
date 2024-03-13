@@ -4,6 +4,27 @@
 #include <stdio.h>
 #include <math.h>
 
+double *spread_matrix(double **matrix, int N, int d)
+{
+    double *arr = (double *)malloc(N * d * sizeof(double));
+    if (arr == NULL)
+    {
+        printf("Memory allocation failed. Exiting.\n");
+        return NULL;
+    }
+
+    int index = 0;
+    for (int i = 0; i < N; i++)
+    {
+        for (int j = 0; j < d; j++)
+        {
+            arr[index++] = matrix[i][j];
+        }
+    }
+
+    return arr;
+}
+
 void printArray(int *arr, int length)
 {
     printf("[");
@@ -76,27 +97,6 @@ PyObject *convert_array_to_python_list(double *arr, int N)
     }
 
     return py_list;
-}
-
-double *spread_matrix(double **matrix, int N, int d)
-{
-    double *arr = (double *)malloc(N * d * sizeof(double));
-    if (arr == NULL)
-    {
-        printf("Memory allocation failed. Exiting.\n");
-        return NULL;
-    }
-
-    int index = 0;
-    for (int i = 0; i < N; i++)
-    {
-        for (int j = 0; j < d; j++)
-        {
-            arr[index++] = matrix[i][j];
-        }
-    }
-
-    return arr;
 }
 
 double **convert_array_to_matrix(double *arr, int N, int d)

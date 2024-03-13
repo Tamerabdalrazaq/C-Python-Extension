@@ -47,7 +47,10 @@ def main():
     print(data.flatten().tolist())
     print(indices)
     outputlist=(g.fit(k, n, d, iter, eps, indices, data.flatten().tolist()))
-    print(1Darr_to_mtrx(outputlist,d,n))
+    print("***************************************")
+    print("Pyhton")
+    print(outputlist)
+    print(arr_to_mtrx(outputlist,d,k))
 
 
 
@@ -108,13 +111,11 @@ def find_DX(clusters, v):
             DX = distance
     return DX
 
-def 1Darr_to_mtrx(outputlist,d,n):
-    mtrx=[]
-    for vec in range(n):
-        inner_arr=[]
-        for entry in range(d):
-            inner_arr.append(entry)
-        mtrx.append(inner_arr)
+def arr_to_mtrx(outputlist,d,k):
+    mtrx=[[0]*d for i in range(k)]
+    print(mtrx)
+    for i in range(len(outputlist)):
+        mtrx[i//d][i%d] = outputlist[i]
     return mtrx
             
     
