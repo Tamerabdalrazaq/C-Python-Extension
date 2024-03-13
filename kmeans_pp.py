@@ -46,7 +46,8 @@ def main():
     indices = (kmeansplus(k, n, d, iter, data))
     print(data.flatten().tolist())
     print(indices)
-    print(g.fit(k, n, d, iter, eps, indices, data.flatten().tolist()))
+    outputlist=(g.fit(k, n, d, iter, eps, indices, data.flatten().tolist()))
+    print(1Darr_to_mtrx(outputlist,d,n))
 
 
 
@@ -107,6 +108,16 @@ def find_DX(clusters, v):
             DX = distance
     return DX
 
+def 1Darr_to_mtrx(outputlist,d,n):
+    mtrx=[]
+    for vec in range(n):
+        inner_arr=[]
+        for entry in range(d):
+            inner_arr.append(entry)
+        mtrx.append(inner_arr)
+    return mtrx
+            
+    
 
 #for checks
 try:
