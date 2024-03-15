@@ -1,4 +1,4 @@
-import kmeansmodule as g
+import mykmeanssp as g
 import pandas as pd
 import sys
 import math
@@ -47,7 +47,7 @@ def main():
     outputlist=(g.fit(k, n, d, iter, eps, indices, data.flatten().tolist()))
     output = arr_to_mtrx(outputlist,d,k)
     out = [[round(num, 4) for num in centroid] for centroid in output]
-    list_str = ', '.join(map(str, indices))
+    list_str = ','.join(map(str, indices))
     print(list_str)
     for row in out:
         print(",".join(map(str, row)))
@@ -117,8 +117,6 @@ def arr_to_mtrx(outputlist,d,k):
     for i in range(len(outputlist)):
         mtrx[i//d][i%d] = outputlist[i]
     return mtrx
-            
-    
 
 #for checks
 try:

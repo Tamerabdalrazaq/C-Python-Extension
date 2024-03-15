@@ -1,6 +1,6 @@
 #ifndef FUNCTIONS_H
 #define FUNCTIONS_H
 
-int myFunction();
+double **k_means(int k, int n, int d, double epsilon, int iter, int *centroids_initial_indexes, double **data);
 
 #endif

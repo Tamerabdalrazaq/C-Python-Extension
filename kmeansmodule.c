@@ -9,8 +9,7 @@ double *spread_matrix(double **matrix, int N, int d)
     double *arr = (double *)malloc(N * d * sizeof(double));
     if (arr == NULL)
     {
-        printf("Memory allocation failed. Exiting.\n");
-        return NULL;
+        exit(1);
     }
 
     int index = 0;
@@ -23,32 +22,6 @@ double *spread_matrix(double **matrix, int N, int d)
     }
 
     return arr;
-}
-
-void printArray(int *arr, int length)
-{
-    printf("[");
-    for (int i = 0; i < length; ++i)
-    {
-        printf("%d", arr[i]);
-        if (i < length - 1)
-        {
-            printf(", ");
-        }
-    }
-    printf("]\n");
-}
-
-void print2DArray(double **arr, int rows, int cols)
-{
-    for (int i = 0; i < rows; i++)
-    {
-        for (int j = 0; j < cols; j++)
-        {
-            printf("%f\t", arr[i][j]);
-        }
-        printf("\n");
-    }
 }
 
 double *k_means_wrapper(int K, int N, int d, int iter, double epsilon, int *indices, double **data)
@@ -77,8 +50,7 @@ PyObject *convert_array_to_python_list(double *arr, int N)
     PyObject *py_list = PyList_New(N);
     if (py_list == NULL)
     {
-        printf("Error creating Python list. Exiting.\n");
-        return NULL;
+        exit(1);
     }
 
     for (int i = 0; i < N; i++)
@@ -86,7 +58,7 @@ PyObject *convert_array_to_python_list(double *arr, int N)
         PyObject *py_double = Py_BuildValue("d", arr[i]);
         if (py_double == NULL)
         {
-            printf("Error creating Python double object. Exiting.\n");
+            exit(1);
             Py_DECREF(py_list);
             return NULL;
         }
@@ -102,8 +74,7 @@ double **convert_array_to_matrix(double *arr, int N, int d)
     double **matrix = (double **)malloc(N * sizeof(double *));
     if (matrix == NULL)
     {
-        printf("Memory allocation failed. Exiting.\n");
-        return NULL;
+        exit(1)
     }
     for (i = 0; i < N; i++)
     {
@@ -130,8 +101,7 @@ void *convert_list_to_int_array(PyObject *list)
     int *arr = (int *)malloc(n * sizeof(int));
     if (arr == NULL)
     {
-        printf("Memory allocation failed. Exiting.\n");
-        return NULL;
+        exit(1)
     }
     int i;
     for (i = 0; i < n; i++)
@@ -154,8 +124,7 @@ void *convert_list_to_double_array(PyObject *list)
     double *arr = (double *)malloc(n * sizeof(double));
     if (arr == NULL)
     {
-        printf("Memory allocation failed. Exiting.\n");
-        return NULL;
+        exit(1)
     }
     int i;
     for (i = 0; i < n; i++)
@@ -200,25 +169,25 @@ static PyMethodDef geoMethods[] = {
      (PyCFunction)fit, /* the C-function that implements the Python function and returns static PyObject*  */
      METH_VARARGS,     /* flags indicating parameters
 accepted for this function */
-     PyDoc_STR("Calculates k_means")},
+     PyDoc_STR("The functi fit is the bridge connecting C and Python.\n The funciton accepts from the Python program the arguments: K, N, d, iter, epsilon, indexes_list, data_list where the indexes_list is the list of indexes return from the kmeans_pp algorithm and the data_list is the list of N given input vectors. Both lists are recieved as a 1D array for the sake of simplicity of data transportaion between C and Python. \nThe function return a Python object representing a 1D Python list that consists of the K centroid returned from the original K-Means algorithm starting from the centroids given by indexes_list. ")},
     /*  The docstring for the function */
     {NULL, NULL, 0, NULL}, /* The last entry must be all NULL as shown to act as a
                               sentinel. Python looks for this entry to know that all
                                 of the functions for the module have been defined. */
 };
 
-static struct PyModuleDef geomodule = {
+static struct PyModuleDef kmeansmodule = {
     PyModuleDef_HEAD_INIT,
-    "kmeansmodule", /* name of module */
-    NULL,           /* module documentation, may be NULL */
-    -1,             /* size of per-interpreter state of the module, or -1 if the module keeps state in global variables. */
-    geoMethods      /* the PyMethodDef array from before containing the methods of the extension */
+    "mykmeanssp", /* name of module */
+    NULL,         /* module documentation, may be NULL */
+    -1,           /* size of per-interpreter state of the module, or -1 if the module keeps state in global variables. */
+    geoMethods    /* the PyMethodDef array from before containing the methods of the extension */
 };
 
-PyMODINIT_FUNC PyInit_kmeansmodule(void)
+PyMODINIT_FUNC PyInit_mykmeanssp(void)
 {
     PyObject *m;
-    m = PyModule_Create(&geomodule);
+    m = PyModule_Create(&kmeansmodule);
     if (!m)
     {
         return NULL;
