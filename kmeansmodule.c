@@ -9,6 +9,7 @@ double *spread_matrix(double **matrix, int N, int d)
     double *arr = (double *)malloc(N * d * sizeof(double));
     if (arr == NULL)
     {
+        printf("An Error Has Occurred");
         exit(1);
     }
 
@@ -20,7 +21,6 @@ double *spread_matrix(double **matrix, int N, int d)
             arr[index++] = matrix[i][j];
         }
     }
-
     return arr;
 }
 
@@ -29,6 +29,8 @@ double *k_means_wrapper(int K, int N, int d, int iter, double epsilon, int *indi
     double **centroids = k_means(K, N, d, epsilon, iter, indices, data);
     double *spread_centroids = spread_matrix(centroids, K, d);
     free_matrix(centroids, K);
+    free_matrix(data, N);
+    free(indices);
     return spread_centroids;
 }
 
@@ -50,6 +52,7 @@ PyObject *convert_array_to_python_list(double *arr, int N)
     PyObject *py_list = PyList_New(N);
     if (py_list == NULL)
     {
+        printf("An Error Has Occurred");
         exit(1);
     }
 
@@ -58,6 +61,7 @@ PyObject *convert_array_to_python_list(double *arr, int N)
         PyObject *py_double = Py_BuildValue("d", arr[i]);
         if (py_double == NULL)
         {
+            printf("An Error Has Occurred");
             exit(1);
             Py_DECREF(py_list);
             return NULL;
@@ -74,7 +78,8 @@ double **convert_array_to_matrix(double *arr, int N, int d)
     double **matrix = (double **)malloc(N * sizeof(double *));
     if (matrix == NULL)
     {
-        exit(1)
+        printf("An Error Has Occurred");
+        exit(1);
     }
     for (i = 0; i < N; i++)
     {
@@ -85,7 +90,6 @@ double **convert_array_to_matrix(double *arr, int N, int d)
         double item = arr[i];
         matrix[i / d][i % d] = item;
     }
-    free(arr);
     return matrix;
 }
 
@@ -101,7 +105,8 @@ void *convert_list_to_int_array(PyObject *list)
     int *arr = (int *)malloc(n * sizeof(int));
     if (arr == NULL)
     {
-        exit(1)
+        printf("An Error Has Occurred");
+        exit(1);
     }
     int i;
     for (i = 0; i < n; i++)
@@ -124,7 +129,8 @@ void *convert_list_to_double_array(PyObject *list)
     double *arr = (double *)malloc(n * sizeof(double));
     if (arr == NULL)
     {
-        exit(1)
+        printf("An Error Has Occurred");
+        exit(1);
     }
     int i;
     for (i = 0; i < n; i++)
@@ -143,7 +149,8 @@ void parse_input(PyObject *args, int *K, int *N, int *d, int *iter, double *epsi
     /* This parses the Python arguments into a double (d)  variable named z and int (i) variable named n*/
     if (!PyArg_ParseTuple(args, "iiiidOO", K, N, d, iter, epsilon, &indexes_list_ptr, &data_list_ptr))
     {
-        return NULL;
+        printf("An Error Has Occurred");
+        exit(1);
     }
     // *data = process_matrix_interface(data_list_ptr);
     *indexes = convert_list_to_int_array(indexes_list_ptr);
@@ -157,9 +164,9 @@ static PyObject *fit(PyObject *self, PyObject *args)
     int *initial_centroid_indexes;
     double *data_array;
     double **data_matrix;
-
     parse_input(args, &K, &N, &d, &iter, &epsilon, &initial_centroid_indexes, &data_array);
     data_matrix = convert_array_to_matrix(data_array, N, d);
+    free(data_array);
     double *spread_centroids = k_means_wrapper(K, N, d, iter, epsilon, initial_centroid_indexes, data_matrix);
     return convert_array_to_python_list(spread_centroids, K * d);
 }

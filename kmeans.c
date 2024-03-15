@@ -41,7 +41,6 @@ void *createArray(int n, int size)
     void *array = malloc(n * size);
     if (array == NULL)
     {
-        printf("An Error Has Occurred");
         exit(1);
     }
     return array;
@@ -54,6 +53,10 @@ double **sub_matrix_k(double **matrix, int k, int d, int *indexes)
     int j;
     double **sub_array;
     sub_array = malloc(k * sizeof(double *));
+    if (sub_array == NULL)
+    {
+        exit(1);
+    }
     for (i = 0; i < k; i++)
     {
         sub_array[i] = (double *)createArray(d, sizeof(double));

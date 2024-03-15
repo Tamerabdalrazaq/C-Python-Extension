@@ -122,6 +122,5 @@ def arr_to_mtrx(outputlist,d,k):
 try:
     main()
 except Exception as e:
-    print("An Error Has Occured")
-    print(e)
+    print("An Error Has Occurred")
     
